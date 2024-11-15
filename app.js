@@ -5,8 +5,7 @@ env.config();
 const authRoutes = require('./routes/authRoutes');
 const profileRoutes = require('./routes/userRoutes');
 const bookRoutes = require('./routes/bookRoutes');
-const {user, book}= require('./models');
-const auth = require('./controller/authController')
+
 
 app.use(express.json());
 app.use('/api/auth', authRoutes);
