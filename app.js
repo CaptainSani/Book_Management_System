@@ -1,18 +1,14 @@
-const express = require('express');
+const express = require("express");
 const app = express();
-const env = require('dotenv');
-env.config();
-const authRoutes = require('./routes/authRoutes');
-const profileRoutes = require('./routes/userRoutes');
-const bookRoutes = require('./routes/bookRoutes');
-
+require('dotenv').config();
+const authRoutes = require("./routes/authRoutes");
+const bookRoutes = require("./routes/bookRoutes");
+const userRoutes = require("./routes/userRoutes");
 
 app.use(express.json());
-app.use('/api/auth', authRoutes);
-app.use('/api/profile', profileRoutes);
-app.use('/api/books', bookRoutes);
 
-app.listen(3000, () => {
-  console.log('Server listening on port 3000');
-});
+app.use("/api/auth", authRoutes);
+app.use("/api/books", bookRoutes);
+app.use("/api/users", userRoutes);
 
+module.exports = app;

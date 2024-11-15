@@ -1,36 +1,67 @@
-const express = require('express');
-const router = express.Router();
-const Book = require('../models/book');
-const authMiddleware = require('../middlewares/authMiddleware');
+const pool = require("../config/dbConfig");
 
-router.post('/', authMiddleware, async (req, res) => {
-  const userId = req.user.userId;
-  const { title, author } = req.body;
-  const book = await Book.createBook(title, author, userId);
-  res.json(book);
-});
 
-router.get('/', authMiddleware, async (req, res) => {
-  const userId = req.user.userId;
-  const books = await Book.getBooksByUser(userId);
-  res.json(books);
-});
+const bookController = {
+  createBook: async (req, res) => {
+    try {
+      const { title, author } = req.body;
+      const result = await pool.query(
+        'INSERT INTO books (title, author) VALUES ($1, $2) RETURNING *',
+        [title, author, description]
+      );
+      res.json(result.rows[0]);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Book creation failed' });
+    }
+  },
 
-router.get('/:id', authMiddleware, async (req, res) => {
-  const bookId = req.params.id;
-  const book = await Book.getBookById(bookId);
-  res.json(book);
-});
+  getBooks: async (req, res) => {
+    try {
+      const result = await pool.query('SELECT * FROM books');
+      res.json(result.rows);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Book retrieval failed' });
+    }
+  },
 
-router.put('/:id', authMiddleware, async (req, res) => {
-  const bookId = req.params.id;
-  const { title, author } = req.body;
-  const book = await Book.updateBook(bookId, title, author);
-  res.json(book);
-});
+  getBookById: async (req, res) => {
+    try {
+      const id = req.params.id;
+      const result = await pool.query('SELECT * FROM books WHERE id = $1', [id]);
+      res.json(result.rows[0]);
+    } catch (error) {
+      console.error(error);
+      res.status(404).json({ error: 'Book not found' });
+    }
+  },
 
-router.delete('/:id', authMiddleware, async (req, res) => {
-  const bookId = req.params.id;
-  await Book.deleteBook(bookId);
-  res.json({ message: 'Book deleted successfully' });
-});
+  updateBook: async (req, res) => {
+    try {
+      const id = req.params.id;
+      const { title, author } = req.body;
+      const result = await pool.query(
+        'UPDATE books SET title = $1, author = $2 WHERE id = $4 RETURNING *',
+        [title, author, id]
+      );
+      res.json(result.rows[0]);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Book update failed' });
+    }
+  },
+
+  deleteBook: async (req, res) => {
+    try {
+      const id = req.params.id;
+      await pool.query('DELETE FROM books WHERE id = $1', [id]);
+      res.json({ message: 'Book deleted successfully' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Book deletion failed' });
+    }
+  },
+};
+
+module.exports = bookController;
