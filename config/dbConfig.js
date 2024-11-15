@@ -1,11 +1,12 @@
 const { Pool } = require('pg');
+const env = require('dotenv').config();
 
 const pool = new Pool({
-    user: 'postgres',      
-    host: 'localhost',
-    database: 'BookManagementSystem',
-    password: '1234567890',
-    port: 5432,         
+    user: process.env.DB_USER,      
+    host: process.env.DB_HOST,
+    database: process.env.DB_NAME,
+    password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT,         
 });
 
 pool.query("SELECT NOW()", (err, res) => {
@@ -22,7 +23,7 @@ pool.query("SELECT NOW()", (err, res) => {
       if (err) {
         console.error("Error creating table:", err);
       } else {
-        console.log("Table created successfully");
+        console.log("Users Table created successfully");
       }
     }
   );
@@ -33,7 +34,7 @@ pool.query("SELECT NOW()", (err, res) => {
       if (err) {
         console.error("Error creating table:", err);
       } else {
-        console.log("Table created successfully");
+        console.log("Books Table created successfully");
       }
     }
   );
